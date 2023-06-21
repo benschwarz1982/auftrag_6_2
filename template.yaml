@@ -1,0 +1,95 @@
+﻿kind: Template
+apiVersion: template.openshift.io/v1
+metadata:
+  name: auftrag-6-2
+  annotations:
+    openshift.io/display-name: "HTML Page based on Auftrag 6.2. Example"
+    description: "A simple HTML Page"
+    iconClass: "icon-play"
+    tags: "html"
+objects:
+  - kind: Deployment
+    apiVersion: apps/v1
+    metadata:
+      name: html-page
+      labels:
+        app: html-page
+        app.kubernetes.io/component: html-page
+        app.kubernetes.io/instance: html-page
+        app.kubernetes.io/name: html-page
+        app.kubernetes.io/part-of: auftrag-6-2
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: html-page
+      template:
+        metadata:
+          labels:
+            app: html-page
+            deployment: html-page
+        spec:
+          containers:
+            - name: html-page
+              image: 'ghcr.io/benschwarz1982/html-page:v2'
+              ports:
+                - containerPort: 8080
+                  protocol: TCP
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              imagePullPolicy: IfNotPresent
+          restartPolicy: Always
+          terminationGracePeriodSeconds: 30
+          dnsPolicy: ClusterFirst
+          securityContext: {}
+          schedulerName: default-scheduler
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 25%
+          maxSurge: 25%
+          revisionHistoryLimit: 10
+          progressDeadlineSeconds: 600
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      name: html-page
+      labels:
+        app: html-page
+        app.kubernetes.io/component: html-page
+        app.kubernetes.io/instance: html-page
+        app.kubernetes.io/name: html-page
+        app.kubernetes.io/part-of: auftrag-6-2
+    spec:
+      ports:
+        - name: 8080-tcp
+          protocol: TCP
+          port: 8080
+          targetPort: 8080
+      internalTrafficPolicy: Cluster
+      type: ClusterIP
+      sessionAffinity: None
+      selector:
+        app: html-page
+        deployment: html-page
+  - kind: Route
+    apiVersion: route.openshift.io/v1
+    metadata:
+      name: html-page
+      labels:
+        app: html-page
+        app.kubernetes.io/component: html-page
+        app.kubernetes.io/instance: html-page
+        app.kubernetes.io/name: html-page
+        app.kubernetes.io/part-of: auftrag-6-2
+    spec:
+      to:
+        kind: Service
+        name: html-page
+      port:
+        targetPort: 8080-tcp
+      tls:
+        termination: edge
+        insecureEdgeTerminationPolicy: Redirect
+      wildcardPolicy: None

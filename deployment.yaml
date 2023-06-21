@@ -1,5 +1,5 @@
-kind: Deployment
 apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: html-page
   labels:
@@ -41,9 +41,9 @@ spec:
       maxSurge: 25%
   revisionHistoryLimit: 10
   progressDeadlineSeconds: 600
-
-kind: Service
+---
 apiVersion: v1
+kind: Service
 metadata:
   name: html-page
   labels:
@@ -64,9 +64,9 @@ spec:
   selector:
     app: html-page
     deployment: html-page
-
-kind: Route
+---
 apiVersion: route.openshift.io/v1
+kind: Route
 metadata:
   name: html-page
   labels:
