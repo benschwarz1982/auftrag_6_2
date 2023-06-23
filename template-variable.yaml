@@ -38,7 +38,7 @@ objects:
         spec:
           containers:
             - name: html-page
-              image: ${NAMESPACE}
+              image: ${SOURCE_IMAGE_URL}
               ports:
                 - containerPort: 8080
                   protocol: TCP
